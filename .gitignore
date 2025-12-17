@@ -1,0 +1,14 @@
+cache/
+out/
+lib/
+
+# Dotenv file
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

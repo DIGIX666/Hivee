@@ -1,0 +1,33 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+test = "test"
+script = "script"
+cache_path = "cache"
+
+# See more config options https://github.com/foundry-rs/foundry/tree/master/config
+
+solc_version = "0.8.19"
+optimizer = true
+optimizer_runs = 200
+via_ir = true
+
+# Rpc endpoints
+[rpc_endpoints]
+capx = "https://rpc.capx.ai"
+capx_testnet = "https://testnet-rpc.capx.ai"
+
+# Etherscan API keys
+[etherscan]
+capx = { key = "${CAPX_API_KEY}" }
+capx_testnet = { key = "${CAPX_TESTNET_API_KEY}" }
+
+# Gas price
+gas_price = 2000000000
+
+# Remappings
+remappings = [
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+    "@forge-std/=lib/forge-std/src/",
+]
