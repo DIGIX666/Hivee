@@ -48,4 +48,4 @@ This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENS
 
 ---
 
-**Built with ❤️ by Kazai and Thox for the future of autonomous AI finance**
+**Built with ❤️ by [Kazai](https://github.com/kazai777/) and [Thox](https://github.com/digix666) for the future of autonomous AI finance**
