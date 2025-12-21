@@ -1,0 +1,15 @@
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.5.0
+requests==2.31.0
+python-multipart==0.0.6
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.2
+groq==1.0.0
+python-dotenv==1.0.0
+crewai
+langchain
+web3==6.13.0
+eth-account==0.10.0
+walletconnect-python==1.0.0
