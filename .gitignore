@@ -1,9 +1,27 @@
+# Build outputs
 cache/
 out/
 lib/
+.next/
+dist/
+build/
 
-# Dotenv file
+# Dependencies
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.pytest_cache/
+
+# Dotenv files
 .env
+.env.*
+!.env.example
 
 # IDE
 .vscode/
