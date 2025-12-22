@@ -51,7 +51,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
   const {
     account,
     connected,
-    isChilizSpicyNetwork,
+    isCapxTestnet,
     formatBalance,
     initiateWalletConnection,
     confirmWalletConnection,
@@ -135,7 +135,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
   }
 
   const handleConnectWalletToAgent = async () => {
-    if (!connected || !isChilizSpicyNetwork) {
+    if (!connected || !isCapxTestnet) {
       return
     }
 
@@ -257,7 +257,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
     )
   }
 
-  if (!isChilizSpicyNetwork) {
+  if (!isCapxTestnet) {
     if (compact) {
       return (
         <div className="text-center p-3">
@@ -266,7 +266,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
             Wrong Network
           </Button>
           <p className="text-xs text-muted-foreground mt-2">
-            Changez vers Chiliz Spicy
+            Changez vers CapX Testnet
           </p>
         </div>
       )
@@ -278,7 +278,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
             <AlertCircle className="h-8 w-8 mx-auto mb-4 text-amber-500" />
             <h3 className="font-semibold mb-2">Réseau incorrect</h3>
             <p className="text-sm text-muted-foreground">
-              Veuillez vous connecter au réseau Chiliz Spicy pour continuer
+              Veuillez vous connecter au réseau CapX Testnet pour continuer
             </p>
           </div>
         </CardContent>
@@ -345,7 +345,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <Label htmlFor="deposit-amount">Montant (CHZ)</Label>
+                          <Label htmlFor="deposit-amount">Montant (CAPX)</Label>
                           <Input
                             id="deposit-amount"
                             type="number"
@@ -381,7 +381,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <Label htmlFor="withdraw-amount">Montant (CHZ)</Label>
+                          <Label htmlFor="withdraw-amount">Montant (CAPX)</Label>
                           <Input
                             id="withdraw-amount"
                             type="number"
@@ -494,7 +494,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="deposit-amount">Montant (CHZ)</Label>
+                      <Label htmlFor="deposit-amount">Montant (CAPX)</Label>
                       <Input
                         id="deposit-amount"
                         type="number"
@@ -540,7 +540,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="withdraw-amount">Montant (CHZ)</Label>
+                      <Label htmlFor="withdraw-amount">Montant (CAPX)</Label>
                       <Input
                         id="withdraw-amount"
                         type="number"
@@ -551,7 +551,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                         step="0.001"
                       />
                       <div className="text-xs text-muted-foreground mt-1">
-                        Capital disponible: {formatBalance(balanceInfo?.available_capital || 0)} CHZ
+                        Capital disponible: {formatBalance(balanceInfo?.available_capital || 0)} CAPX
                       </div>
                     </div>
                     <div>
@@ -637,7 +637,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                                 </div>
                                 <div className="text-right">
                                   <div className="font-semibold">
-                                    {formatBalance(tx.amount)} CHZ
+                                    {formatBalance(tx.amount)} CAPX
                                   </div>
                                   {getStatusBadge(tx.status)}
                                 </div>

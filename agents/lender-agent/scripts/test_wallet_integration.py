@@ -64,7 +64,7 @@ async def test_wallet_integration():
     # Step 3: Simulate wallet connection confirmation
     print("\n3️⃣ Confirming wallet connection...")
     test_wallet_address = "0x742d35Cc6677C4532A8d7Aa9e7F8b7e4b8c8e8d8"
-    chain_id = 1337  # CapX chain ID
+    chain_id = 756  # CapX Testnet chain ID
 
     response = requests.post(
         f"{BASE_URL}/wallet/confirm",

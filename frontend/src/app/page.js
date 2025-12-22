@@ -28,7 +28,7 @@ export default function HomePage() {
   // Hook wallet
   const {
     connected,
-    isChilizSpicyNetwork,
+    isCapxTestnet,
     depositFunds,
     sendTransaction,
     account
@@ -71,11 +71,11 @@ export default function HomePage() {
         setIsCreateModalOpen(false)
 
         // Si le wallet est connecté et on est sur le bon réseau, proposer le dépôt automatique
-        if (connected && isChilizSpicyNetwork && agentData.config.available_capital > 0) {
+        if (connected && isCapxTestnet && agentData.config.available_capital > 0) {
           setNewlyCreatedAgent(newAgent)
-          // Convertir le capital en CHZ (pour la démo: 1 USD ≈ 0.01 CHZ, ajustable selon le taux de change)
-          const capitalInCHZ = (agentData.config.available_capital * 0.01).toFixed(4)
-          setDepositAmount(capitalInCHZ)
+          // Convertir le capital en CAPX (pour la démo: 1 USD ≈ 0.01 CAPX, ajustable selon le taux de change)
+          const capitalInCAPX = (agentData.config.available_capital * 0.01).toFixed(4)
+          setDepositAmount(capitalInCAPX)
           setIsDepositModalOpen(true)
         }
       } else {
@@ -137,7 +137,7 @@ export default function HomePage() {
               AI Agent Management avec WalletConnect
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Deploy and manage autonomous lending agents on the Chiliz Spicy testnet
+              Deploy and manage autonomous lending agents on the CapX Testnet
             </p>
           </div>
 
@@ -321,7 +321,7 @@ export default function HomePage() {
                 <div className="space-y-4">
                   <div className="bg-muted/50 rounded-lg p-4">
                     <div className="text-sm text-muted-foreground">Capital configuré</div>
-                    <div className="text-xl font-bold">{depositAmount} CHZ</div>
+                    <div className="text-xl font-bold">{depositAmount} CAPX</div>
                     <div className="text-xs text-muted-foreground mt-1">
                       (~${newlyCreatedAgent?.config?.available_capital || 0} USD)
                     </div>
@@ -343,16 +343,16 @@ export default function HomePage() {
                     </Button>
                     <Button
                       onClick={handleAutomaticDeposit}
-                      disabled={depositLoading || !connected || !isChilizSpicyNetwork}
+                      disabled={depositLoading || !connected || !isCapxTestnet}
                       className="flex-1"
                     >
                       {depositLoading ? 'Dépôt...' : 'Déposer maintenant'}
                     </Button>
                   </div>
 
-                  {(!connected || !isChilizSpicyNetwork) && (
+                  {(!connected || !isCapxTestnet) && (
                     <div className="text-xs text-amber-600 bg-amber-50 p-2 rounded">
-                      ⚠️ Wallet non connecté ou réseau incorrect. Connectez-vous au réseau Chiliz Spicy.
+                      ⚠️ Wallet non connecté ou réseau incorrect. Connectez-vous au réseau CapX Testnet.
                     </div>
                   )}
                 </div>
@@ -369,7 +369,7 @@ export default function HomePage() {
                   Test WalletConnect
                 </CardTitle>
                 <CardDescription>
-                  Connectez votre wallet MetaMask pour tester l'intégration Chiliz Spicy
+                  Connectez votre wallet MetaMask pour tester l'intégration CapX Testnet
                 </CardDescription>
               </CardHeader>
               <CardContent>

@@ -31,8 +31,8 @@ export function WalletConnectButton({ size = "default", variant = "default" }) {
     error,
     connectWallet,
     disconnect,
-    isChilizSpicyNetwork,
-    switchToChilizSpicyNetwork,
+    isCapxTestnet,
+    switchToCapxTestnetNetwork,
     formatBalance
   } = useWallet()
 
@@ -60,8 +60,8 @@ export function WalletConnectButton({ size = "default", variant = "default" }) {
   }
 
   const openExplorer = () => {
-    if (account && isChilizSpicyNetwork) {
-      window.open(`https://spicy-explorer.chiliz.com/address/${account}`, '_blank')
+    if (account && isCapxTestnet) {
+      window.open(`https://capx-testnet-c1.explorer.caldera.xyz/address/${account}`, '_blank')
     }
   }
 
@@ -133,15 +133,15 @@ export function WalletConnectButton({ size = "default", variant = "default" }) {
             {/* Balance */}
             <div className="text-sm mb-2">
               <span className="text-muted-foreground">Balance: </span>
-              <span className="font-semibold">{formatBalance(balance)} CHZ</span>
+              <span className="font-semibold">{formatBalance(balance)} CAPX</span>
             </div>
 
             {/* État du réseau */}
             <div className="flex items-center gap-2 mb-3">
-              {isChilizSpicyNetwork ? (
+              {isCapxTestnet ? (
                 <Badge variant="success" className="text-xs">
                   <CheckCircle className="h-3 w-3 mr-1" />
-                  Chiliz Spicy
+                  CapX Testnet
                 </Badge>
               ) : (
                 <Badge variant="destructive" className="text-xs">
@@ -159,17 +159,17 @@ export function WalletConnectButton({ size = "default", variant = "default" }) {
             Copier l'adresse
           </DropdownMenuItem>
 
-          {isChilizSpicyNetwork && (
+          {isCapxTestnet && (
             <DropdownMenuItem onClick={openExplorer} className="cursor-pointer">
               <ExternalLink className="h-4 w-4 mr-2" />
               Voir dans l'explorateur
             </DropdownMenuItem>
           )}
 
-          {!isChilizSpicyNetwork && (
-            <DropdownMenuItem onClick={switchToChilizSpicyNetwork} className="cursor-pointer">
+          {!isCapxTestnet && (
+            <DropdownMenuItem onClick={switchToCapxTestnetNetwork} className="cursor-pointer">
               <AlertCircle className="h-4 w-4 mr-2" />
-              Changer vers Chiliz Spicy
+              Changer vers CapX Testnet
             </DropdownMenuItem>
           )}
 
@@ -183,10 +183,10 @@ export function WalletConnectButton({ size = "default", variant = "default" }) {
       </DropdownMenu>
 
       {/* Alerte réseau */}
-      {!isChilizSpicyNetwork && (
+      {!isCapxTestnet && (
         <div className="flex items-center gap-2 text-amber-600 text-sm">
           <AlertCircle className="h-4 w-4" />
-          <span>Veuillez vous connecter au réseau Chiliz Spicy</span>
+          <span>Veuillez vous connecter au réseau CapX Testnet</span>
         </div>
       )}
     </div>
@@ -198,7 +198,7 @@ export function WalletStatusCard() {
     account,
     balance,
     connected,
-    isChilizSpicyNetwork,
+    isCapxTestnet,
     formatBalance
   } = useWallet()
 
@@ -238,17 +238,17 @@ export function WalletStatusCard() {
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">Balance</span>
               <span className="text-xs font-semibold">
-                {formatBalance(balance)} CHZ
+                {formatBalance(balance)} CAPX
               </span>
             </div>
 
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">Réseau</span>
               <Badge
-                variant={isChilizSpicyNetwork ? "success" : "destructive"}
+                variant={isCapxTestnet ? "success" : "destructive"}
                 className="text-xs"
               >
-                {isChilizSpicyNetwork ? "Chiliz Spicy" : "Incorrect"}
+                {isCapxTestnet ? "CapX Testnet" : "Incorrect"}
               </Badge>
             </div>
           </div>

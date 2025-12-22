@@ -6,17 +6,17 @@ import { ethers } from 'ethers'
 // Wallet Context
 const WalletContext = createContext()
 
-// Configuration pour Chiliz Spicy Testnet
-const CHILIZ_SPICY_NETWORK_CONFIG = {
-  chainId: '0x15B32', // 88882 en hexadécimal
-  chainName: 'Chiliz Spicy Testnet',
-  rpcUrls: ['https://chiliz-spicy-rpc.publicnode.com'],
+// Configuration pour CapX Testnet
+const CAPX_TESTNET_NETWORK_CONFIG = {
+  chainId: '0x2F4', // 756 en hexadécimal
+  chainName: 'Capx Testnet',
+  rpcUrls: ['https://capx-testnet-c1.rpc.caldera.xyz/http'],
   nativeCurrency: {
-    name: 'Chiliz',
-    symbol: 'CHZ',
+    name: 'CAPX',
+    symbol: 'CAPX',
     decimals: 18,
   },
-  blockExplorerUrls: ['https://spicy-explorer.chiliz.com'],
+  blockExplorerUrls: ['https://capx-testnet-c1.explorer.caldera.xyz'],
 }
 
 // API URL de l'agent lender
@@ -114,8 +114,8 @@ export function WalletProvider({ children }) {
       console.log('ConnectWallet: connected to', { address, chainId: network.chainId.toString() })
 
       // Vérifier si on est sur le bon réseau
-      if (network.chainId !== 88882n) {
-        const switchResult = await switchToChilizSpicyNetwork()
+      if (network.chainId !== 756n) {
+        const switchResult = await switchToCapxTestnetNetwork()
         if (!switchResult) {
           setConnecting(false)
           return false
@@ -152,11 +152,11 @@ export function WalletProvider({ children }) {
     }
   }
 
-  const switchToChilizSpicyNetwork = async () => {
+  const switchToCapxTestnetNetwork = async () => {
     try {
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: CHILIZ_SPICY_NETWORK_CONFIG.chainId }],
+        params: [{ chainId: CAPX_TESTNET_NETWORK_CONFIG.chainId }],
       })
       return true
     } catch (error) {
@@ -165,17 +165,17 @@ export function WalletProvider({ children }) {
         try {
           await window.ethereum.request({
             method: 'wallet_addEthereumChain',
-            params: [CHILIZ_SPICY_NETWORK_CONFIG],
+            params: [CAPX_TESTNET_NETWORK_CONFIG],
           })
           return true
         } catch (addError) {
           console.error('Erreur lors de l\'ajout du réseau:', addError)
-          setError('Impossible d\'ajouter le réseau Chiliz Spicy')
+          setError('Impossible d\'ajouter le réseau CapX Testnet')
           return false
         }
       }
       console.error('Erreur lors du changement de réseau:', error)
-      setError('Impossible de changer vers le réseau Chiliz Spicy')
+      setError('Impossible de changer vers le réseau CapX Testnet')
       return false
     }
   }
@@ -231,7 +231,7 @@ export function WalletProvider({ children }) {
     }
   }
 
-  const confirmWalletConnection = async (sessionId, walletAddress, chainId = 88882) => {
+  const confirmWalletConnection = async (sessionId, walletAddress, chainId = 756) => {
     try {
       const url = `${LENDER_API_URL}/wallet/confirm?session_id=${encodeURIComponent(sessionId)}&wallet_address=${encodeURIComponent(walletAddress)}&chain_id=${chainId}`
       const response = await fetch(url, {
@@ -396,7 +396,7 @@ export function WalletProvider({ children }) {
     // Actions du wallet
     connectWallet,
     disconnect,
-    switchToChilizSpicyNetwork,
+    switchToCapxTestnetNetwork,
     updateBalance,
     sendTransaction,
 
@@ -410,7 +410,7 @@ export function WalletProvider({ children }) {
     getAgentFundsBalance,
 
     // Utilitaires
-    isChilizSpicyNetwork: chainId === '88882',
+    isCapxTestnet: chainId === '756',
     formatBalance: (bal) => parseFloat(bal || 0).toFixed(4),
   }
 
