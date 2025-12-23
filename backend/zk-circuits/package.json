@@ -1,0 +1,19 @@
+{
+  "name": "hivee-zk-circuits",
+  "version": "1.0.0",
+  "description": "ZK-SNARK circuits for Hivee task proofs",
+  "scripts": {
+    "install-circomlib": "npm install circomlib",
+    "download-ptau": "wget https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_14.ptau",
+    "compile": "circom task_proof.circom --r1cs --wasm --sym -o build",
+    "setup": "snarkjs groth16 setup build/task_proof.r1cs powersOfTau28_hez_final_14.ptau keys/task_proof_0000.zkey && snarkjs zkey contribute keys/task_proof_0000.zkey keys/task_proof_0001.zkey --name='First contribution' -v && snarkjs zkey export verificationkey keys/task_proof_0001.zkey keys/verification_key.json && mv keys/task_proof_0001.zkey keys/task_proof.zkey",
+    "generate-proof": "snarkjs groth16 fullprove inputs.json build/task_proof_js/task_proof.wasm keys/task_proof.zkey proof.json public.json",
+    "verify-proof": "snarkjs groth16 verify keys/verification_key.json public.json proof.json",
+    "export-verifier": "snarkjs zkey export solidityverifier keys/task_proof.zkey verifier.sol",
+    "test": "npm run generate-proof && npm run verify-proof"
+  },
+  "dependencies": {
+    "circomlib": "^2.0.5",
+    "snarkjs": "^0.7.5"
+  }
+}

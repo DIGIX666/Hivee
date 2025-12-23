@@ -1,12 +1,12 @@
 {
-  "name": "frontend",
-  "version": "0.1.0",
+  "name": "hivee-frontend",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -27,12 +27,26 @@
     "next": "16.1.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.0",
+    "@radix-ui/react-toast": "^1.2.2",
+    "axios": "^1.7.9",
+    "next-themes": "^0.4.6",
+    "react-dropzone": "^14.3.5",
+    "sonner": "^2.0.7",
+    "tailwindcss-animate": "^1.0.7",
+    "viem": "^2.21.49",
+    "wagmi": "^2.12.29"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/node": "^22.10.1",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.2",
+    "autoprefixer": "^10.4.20",
     "eslint": "^9",
     "eslint-config-next": "16.1.0",
-    "tailwindcss": "^4"
+    "postcss": "^8.4.49",
+    "tailwindcss": "^4",
+    "typescript": "^5.7.2"
   }
 }

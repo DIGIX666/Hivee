@@ -1,0 +1,8 @@
+# Place compiled contract ABIs here
+# Files needed:
+# - AgentIdentity.json
+# - AgentEscrow.json
+# - BrokerAgent.json
+# - LenderAgent.json
+#
+# Copy from contracts/out/ after running `forge build`
