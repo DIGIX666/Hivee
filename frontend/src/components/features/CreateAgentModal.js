@@ -106,7 +106,7 @@ export default function CreateAgentModal({ isOpen, onClose, onAgentCreated }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Available Capital ($)</label>
+                  <label className="block text-sm font-medium mb-2">Available Capital (CAPX)</label>
                   <div className="relative">
                     <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                     <Input
@@ -126,7 +126,7 @@ export default function CreateAgentModal({ isOpen, onClose, onAgentCreated }) {
               {/* Lending Limits */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Max Loan Amount ($)</label>
+                  <label className="block text-sm font-medium mb-2">Max Loan Amount (CAPX)</label>
                   <div className="relative">
                     <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                     <Input
@@ -199,7 +199,7 @@ export default function CreateAgentModal({ isOpen, onClose, onAgentCreated }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Fixed Fee ($)</label>
+                  <label className="block text-sm font-medium mb-2">Fixed Fee (CAPX)</label>
                   <div className="relative">
                     <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                     <Input

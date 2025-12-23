@@ -65,7 +65,7 @@ class GroqLLMAgent:
 Analyze this DeFi loan application and provide a comprehensive risk assessment:
 
 **LOAN APPLICATION:**
-- Amount: ${loan_data.get('amount', 'N/A'):,}
+- Amount: {loan_data.get('amount', 'N/A'):,} CAPX
 - Interest Rate: {loan_data.get('interest_rate', 'N/A')}%
 - Duration: {loan_data.get('duration_days', 'N/A')} days
 - Borrower Credit Score: {loan_data.get('credit_score', 'N/A')}/1000 (ERC-8004)
@@ -74,12 +74,12 @@ Analyze this DeFi loan application and provide a comprehensive risk assessment:
 - Borrower ID: {loan_data.get('borrower_id', 'N/A')}
 
 **LENDER CONFIGURATION:**
-- Max Loan Amount: ${lender_config.get('max_loan_amount', 'N/A'):,}
+- Max Loan Amount: {lender_config.get('max_loan_amount', 'N/A'):,} CAPX
 - Min Credit Score Required: {lender_config.get('min_credit_score', 'N/A')}/1000
 - Max Interest Rate: {lender_config.get('max_interest_rate', 'N/A')}%
 - Risk Tolerance: {lender_config.get('risk_tolerance', 'N/A')}
-- Available Capital: ${lender_config.get('available_capital', 'N/A'):,}
-- Auto-Approve Threshold: ${lender_config.get('auto_approve_threshold', 'N/A'):,}
+- Available Capital: {lender_config.get('available_capital', 'N/A'):,} CAPX
+- Auto-Approve Threshold: {lender_config.get('auto_approve_threshold', 'N/A'):,} CAPX
 
 Please provide your analysis in the following JSON format:
 

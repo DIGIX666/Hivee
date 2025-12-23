@@ -127,7 +127,7 @@ class LenderCrewAI:
             Analyze the following loan request for financial risks:
 
             Loan Details:
-            - Amount: ${loan_data.get('amount', 'N/A'):,}
+            - Amount: {loan_data.get('amount', 'N/A'):,} CAPX
             - Interest Rate: {loan_data.get('interest_rate', 'N/A')}%
             - Duration: {loan_data.get('duration_days', 'N/A')} days
             - Borrower Credit Score: {loan_data.get('credit_score', 'N/A')}/1000 (ERC-8004)
@@ -135,10 +135,10 @@ class LenderCrewAI:
             - Purpose: {loan_data.get('purpose', 'Not specified')}
 
             Lender Configuration:
-            - Max Loan Amount: ${lender_config.get('max_loan_amount', 'N/A'):,}
+            - Max Loan Amount: {lender_config.get('max_loan_amount', 'N/A'):,} CAPX
             - Min Credit Score: {lender_config.get('min_credit_score', 'N/A')}/1000
             - Risk Tolerance: {lender_config.get('risk_tolerance', 'N/A')}
-            - Available Capital: ${lender_config.get('available_capital', 'N/A'):,}
+            - Available Capital: {lender_config.get('available_capital', 'N/A'):,} CAPX
 
             Provide a comprehensive risk analysis including:
             1. Credit risk assessment (0-100 scale, lower is better)

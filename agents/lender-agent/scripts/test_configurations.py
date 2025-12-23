@@ -35,13 +35,13 @@ def test_lender_configurations():
     agent_conservative = service.create_lender_agent("Agent Conservateur", config_conservative)
     print(f"   ✅ Agent créé: {agent_conservative.id}")
     print(f"   📊 Score minimum: {config_conservative.min_credit_score}")
-    print(f"   💰 Montant max: ${config_conservative.max_loan_amount}")
+    print(f"   💰 Montant max: {config_conservative.max_loan_amount} CAPX")
     print(f"   📈 Taux de base: {config_conservative.base_interest_rate}%")
-    print(f"   💳 Frais: {config_conservative.credit_fee_percentage}% + ${config_conservative.fixed_processing_fee}")
+    print(f"   💳 Frais: {config_conservative.credit_fee_percentage}% + {config_conservative.fixed_processing_fee} CAPX")
 
-    # Test calcul des coûts pour prêt de 1000$ sur 30 jours
+    # Test calcul des coûts pour prêt de 1000 CAPX sur 30 jours
     costs = service.calculate_total_loan_cost(config_conservative, Decimal("1000"), 30)
-    print(f"   🧮 Coût prêt 1000$/30j: ${costs['total_repayment']:.2f} (APR: {costs['effective_apr']:.1f}%)\n")
+    print(f"   🧮 Coût prêt 1000 CAPX/30j: {costs['total_repayment']:.2f} CAPX (APR: {costs['effective_apr']:.1f}%)\n")
 
     # Configuration 2: Agent agressif
     print("2️⃣ Agent Agressif (Score bas accepté, frais élevés)")
@@ -58,13 +58,13 @@ def test_lender_configurations():
     agent_aggressive = service.create_lender_agent("Agent Agressif", config_aggressive)
     print(f"   ✅ Agent créé: {agent_aggressive.id}")
     print(f"   📊 Score minimum: {config_aggressive.min_credit_score}")
-    print(f"   💰 Montant max: ${config_aggressive.max_loan_amount}")
+    print(f"   💰 Montant max: {config_aggressive.max_loan_amount} CAPX")
     print(f"   📈 Taux de base: {config_aggressive.base_interest_rate}%")
-    print(f"   💳 Frais: {config_aggressive.credit_fee_percentage}% + ${config_aggressive.fixed_processing_fee}")
+    print(f"   💳 Frais: {config_aggressive.credit_fee_percentage}% + {config_aggressive.fixed_processing_fee} CAPX")
 
-    # Test calcul des coûts pour prêt de 1000$ sur 30 jours
+    # Test calcul des coûts pour prêt de 1000 CAPX sur 30 jours
     costs = service.calculate_total_loan_cost(config_aggressive, Decimal("1000"), 30)
-    print(f"   🧮 Coût prêt 1000$/30j: ${costs['total_repayment']:.2f} (APR: {costs['effective_apr']:.1f}%)\n")
+    print(f"   🧮 Coût prêt 1000 CAPX/30j: {costs['total_repayment']:.2f} CAPX (APR: {costs['effective_apr']:.1f}%)\n")
 
     # Configuration 3: Agent équilibré
     print("3️⃣ Agent Équilibré (Paramètres modérés)")
@@ -81,13 +81,13 @@ def test_lender_configurations():
     agent_balanced = service.create_lender_agent("Agent Équilibré", config_balanced)
     print(f"   ✅ Agent créé: {agent_balanced.id}")
     print(f"   📊 Score minimum: {config_balanced.min_credit_score}")
-    print(f"   💰 Montant max: ${config_balanced.max_loan_amount}")
+    print(f"   💰 Montant max: {config_balanced.max_loan_amount} CAPX")
     print(f"   📈 Taux de base: {config_balanced.base_interest_rate}%")
-    print(f"   💳 Frais: {config_balanced.credit_fee_percentage}% + ${config_balanced.fixed_processing_fee}")
+    print(f"   💳 Frais: {config_balanced.credit_fee_percentage}% + {config_balanced.fixed_processing_fee} CAPX")
 
-    # Test calcul des coûts pour prêt de 1000$ sur 30 jours
+    # Test calcul des coûts pour prêt de 1000 CAPX sur 30 jours
     costs = service.calculate_total_loan_cost(config_balanced, Decimal("1000"), 30)
-    print(f"   🧮 Coût prêt 1000$/30j: ${costs['total_repayment']:.2f} (APR: {costs['effective_apr']:.1f}%)\n")
+    print(f"   🧮 Coût prêt 1000 CAPX/30j: {costs['total_repayment']:.2f} CAPX (APR: {costs['effective_apr']:.1f}%)\n")
 
     # Test des rejets basés sur le score de crédit
     print("4️⃣ Test de filtrage par score de crédit")

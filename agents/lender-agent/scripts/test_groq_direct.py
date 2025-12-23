@@ -31,7 +31,7 @@ def test_groq_direct():
             messages=[
                 {
                     "role": "user",
-                    "content": "Analyze this loan: $1000, 750 credit score, 30 days. Should approve? Respond in JSON with recommendation, risk_score, and reasoning."
+                    "content": "Analyze this loan: 1000 CAPX, 750 credit score, 30 days. Should approve? Respond in JSON with recommendation, risk_score, and reasoning."
                 }
             ],
             temperature=0.1,

@@ -65,7 +65,7 @@ export function WalletConnectButton({ size = "default", variant = "default" }) {
     }
   }
 
-  // État de connexion
+  // Connection state
   if (!connected) {
     return (
       <div className="flex flex-col items-center gap-2">
@@ -77,7 +77,7 @@ export function WalletConnectButton({ size = "default", variant = "default" }) {
           className="flex items-center gap-2 min-w-fit"
         >
           <Wallet className="h-4 w-4" />
-          {connecting ? 'Connexion...' : 'Connecter Wallet'}
+          {connecting ? 'Connecting...' : 'Connect Wallet'}
         </Button>
 
         {error && (
@@ -90,7 +90,7 @@ export function WalletConnectButton({ size = "default", variant = "default" }) {
     )
   }
 
-  // État connecté
+  // Connected state
   return (
     <div className="flex flex-col gap-2">
       <DropdownMenu>
@@ -111,9 +111,9 @@ export function WalletConnectButton({ size = "default", variant = "default" }) {
 
         <DropdownMenuContent align="end" className="w-64">
           <div className="p-2">
-            <div className="text-sm font-medium mb-2">Wallet Connecté</div>
+            <div className="text-sm font-medium mb-2">Connected Wallet</div>
 
-            {/* Adresse */}
+            {/* Address */}
             <div className="flex items-center justify-between mb-2 p-2 bg-muted rounded">
               <span className="font-mono text-xs">{truncateAddress(account)}</span>
               <Button
@@ -136,7 +136,7 @@ export function WalletConnectButton({ size = "default", variant = "default" }) {
               <span className="font-semibold">{formatBalance(balance)} CAPX</span>
             </div>
 
-            {/* État du réseau */}
+            {/* Network state */}
             <div className="flex items-center gap-2 mb-3">
               {isCapxTestnet ? (
                 <Badge variant="success" className="text-xs">
@@ -146,7 +146,7 @@ export function WalletConnectButton({ size = "default", variant = "default" }) {
               ) : (
                 <Badge variant="destructive" className="text-xs">
                   <AlertCircle className="h-3 w-3 mr-1" />
-                  Réseau incorrect
+                  Wrong Network
                 </Badge>
               )}
             </div>
@@ -156,20 +156,20 @@ export function WalletConnectButton({ size = "default", variant = "default" }) {
 
           <DropdownMenuItem onClick={copyAddress} className="cursor-pointer">
             <Copy className="h-4 w-4 mr-2" />
-            Copier l'adresse
+            Copy address
           </DropdownMenuItem>
 
           {isCapxTestnet && (
             <DropdownMenuItem onClick={openExplorer} className="cursor-pointer">
               <ExternalLink className="h-4 w-4 mr-2" />
-              Voir dans l'explorateur
+              View in explorer
             </DropdownMenuItem>
           )}
 
           {!isCapxTestnet && (
             <DropdownMenuItem onClick={switchToCapxTestnetNetwork} className="cursor-pointer">
               <AlertCircle className="h-4 w-4 mr-2" />
-              Changer vers CapX Testnet
+              Switch to CapX Testnet
             </DropdownMenuItem>
           )}
 
@@ -177,16 +177,16 @@ export function WalletConnectButton({ size = "default", variant = "default" }) {
 
           <DropdownMenuItem onClick={handleDisconnect} className="cursor-pointer text-red-600">
             <LogOut className="h-4 w-4 mr-2" />
-            Déconnecter
+            Disconnect
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Alerte réseau */}
+      {/* Network alert */}
       {!isCapxTestnet && (
         <div className="flex items-center gap-2 text-amber-600 text-sm">
           <AlertCircle className="h-4 w-4" />
-          <span>Veuillez vous connecter au réseau CapX Testnet</span>
+          <span>Please connect to CapX Testnet network</span>
         </div>
       )}
     </div>
@@ -208,7 +208,7 @@ export function WalletStatusCard() {
         <CardContent className="p-4">
           <div className="text-center">
             <Wallet className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">Wallet non connecté</p>
+            <p className="text-sm text-muted-foreground">Wallet not connected</p>
           </div>
         </CardContent>
       </Card>
@@ -223,13 +223,13 @@ export function WalletStatusCard() {
             <span className="text-sm font-medium">Wallet</span>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-sm text-green-600">Connecté</span>
+              <span className="text-sm text-green-600">Connected</span>
             </div>
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">Adresse</span>
+              <span className="text-xs text-muted-foreground">Address</span>
               <span className="text-xs font-mono">
                 {account ? `${account.slice(0, 6)}...${account.slice(-4)}` : ''}
               </span>
@@ -243,7 +243,7 @@ export function WalletStatusCard() {
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">Réseau</span>
+              <span className="text-xs text-muted-foreground">Network</span>
               <Badge
                 variant={isCapxTestnet ? "success" : "destructive"}
                 className="text-xs"

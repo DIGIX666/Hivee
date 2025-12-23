@@ -11,13 +11,13 @@ export default function SimplePage() {
 
         <div className="space-y-6">
           <div>
-            <h2 className="text-xl font-semibold mb-4">Connexion Wallet</h2>
+            <h2 className="text-xl font-semibold mb-4">Wallet Connection</h2>
             <WalletConnectButton />
           </div>
 
           <div className="p-4 bg-muted rounded-lg">
             <p className="text-sm text-muted-foreground">
-              Connectez votre wallet MetaMask pour tester l'intégration WalletConnect avec le réseau CapX.
+              Connect your MetaMask wallet to test WalletConnect integration with CapX network.
             </p>
           </div>
         </div>

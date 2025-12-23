@@ -6,7 +6,7 @@ import { ethers } from 'ethers'
 // Wallet Context
 const WalletContext = createContext()
 
-// Configuration pour CapX Testnet
+// Configuration for CapX Testnet
 const CAPX_TESTNET_NETWORK_CONFIG = {
   chainId: '0x2F4', // 756 en hexadécimal
   chainName: 'Capx Testnet',
@@ -19,7 +19,7 @@ const CAPX_TESTNET_NETWORK_CONFIG = {
   blockExplorerUrls: ['https://capx-testnet-c1.explorer.caldera.xyz'],
 }
 
-// API URL de l'agent lender
+// Lender agent API URL
 const LENDER_API_URL = 'http://localhost:8000'
 
 export function WalletProvider({ children }) {
@@ -32,12 +32,12 @@ export function WalletProvider({ children }) {
   const [chainId, setChainId] = useState(null)
   const [error, setError] = useState(null)
 
-  // Vérifier la connexion existante au chargement
+  // Check existing connection on load
   useEffect(() => {
     checkConnection()
   }, [])
 
-  // Écouter les changements d'account/réseau
+  // Listen to account/network changes
   useEffect(() => {
     if (typeof window !== 'undefined' && window.ethereum) {
       const handleAccountsChanged = (accounts) => {
@@ -51,7 +51,7 @@ export function WalletProvider({ children }) {
 
       const handleChainChanged = (chainId) => {
         setChainId(chainId)
-        window.location.reload() // Recommandé par MetaMask
+        window.location.reload() // Recommended by MetaMask
       }
 
       window.ethereum.on('accountsChanged', handleAccountsChanged)
@@ -83,18 +83,18 @@ export function WalletProvider({ children }) {
           setChainId(network.chainId.toString())
           setConnected(true)
 
-          // Passer le provider explicitement pour éviter les problèmes de timing
+          // Pass provider explicitly to avoid timing issues
           await updateBalance(address, provider)
         }
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification de la connexion:', error)
+      console.error('Error checking connection:', error)
     }
   }
 
   const connectWallet = async () => {
     if (typeof window === 'undefined' || !window.ethereum) {
-      setError('MetaMask n\'est pas installé')
+      setError('MetaMask is not installed')
       return false
     }
 
@@ -103,7 +103,7 @@ export function WalletProvider({ children }) {
 
     try {
       console.log('ConnectWallet: requesting accounts')
-      // Demander la connexion
+      // Request connection
       await window.ethereum.request({ method: 'eth_requestAccounts' })
 
       const provider = new ethers.BrowserProvider(window.ethereum)
@@ -113,16 +113,16 @@ export function WalletProvider({ children }) {
 
       console.log('ConnectWallet: connected to', { address, chainId: network.chainId.toString() })
 
-      // Vérifier si on est sur le bon réseau
+      // Check if we're on the correct network
       if (network.chainId !== 756n) {
         const switchResult = await switchToCapxTestnetNetwork()
         if (!switchResult) {
           setConnecting(false)
           return false
         }
-        // Attendre un peu pour que MetaMask se mette à jour
+        // Wait a bit for MetaMask to update
         await new Promise(resolve => setTimeout(resolve, 1000))
-        // Recharger le provider et le réseau après le switch
+        // Reload provider and network after switch
         const newProvider = new ethers.BrowserProvider(window.ethereum)
         const newSigner = await newProvider.getSigner()
         const newNetwork = await newProvider.getNetwork()
@@ -145,7 +145,7 @@ export function WalletProvider({ children }) {
       setConnecting(false)
       return true
     } catch (error) {
-      console.error('Erreur de connexion:', error)
+      console.error('Connection error:', error)
       setError(error.message)
       setConnecting(false)
       return false
@@ -160,7 +160,7 @@ export function WalletProvider({ children }) {
       })
       return true
     } catch (error) {
-      // Si le réseau n'existe pas, l'ajouter
+      // If the network doesn't exist, add it
       if (error.code === 4902) {
         try {
           await window.ethereum.request({
@@ -169,13 +169,13 @@ export function WalletProvider({ children }) {
           })
           return true
         } catch (addError) {
-          console.error('Erreur lors de l\'ajout du réseau:', addError)
-          setError('Impossible d\'ajouter le réseau CapX Testnet')
+          console.error('Error adding network:', addError)
+          setError('Unable to add CapX Testnet network')
           return false
         }
       }
-      console.error('Erreur lors du changement de réseau:', error)
-      setError('Impossible de changer vers le réseau CapX Testnet')
+      console.error('Error changing network:', error)
+      setError('Unable to switch to CapX Testnet network')
       return false
     }
   }
@@ -198,7 +198,7 @@ export function WalletProvider({ children }) {
       console.log('UpdateBalance: formatted balance', formattedBalance)
       setBalance(formattedBalance)
     } catch (error) {
-      console.error('Erreur lors de la récupération du balance:', error)
+      console.error('Error fetching balance:', error)
       setBalance('0')
     }
   }
@@ -213,7 +213,7 @@ export function WalletProvider({ children }) {
     setError(null)
   }
 
-  // Fonctions d'intégration avec l'API Agent Lender
+  // Lender Agent API integration functions
   const initiateWalletConnection = async (agentId) => {
     try {
       const response = await fetch(`${LENDER_API_URL}/wallet/connect?agent_id=${agentId}`, {
@@ -221,12 +221,12 @@ export function WalletProvider({ children }) {
       })
 
       if (!response.ok) {
-        throw new Error('Échec de l\'initiation de la connexion')
+        throw new Error('Failed to initiate connection')
       }
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur initiation connexion:', error)
+      console.error('Error initiating connection:', error)
       throw error
     }
   }
@@ -242,12 +242,12 @@ export function WalletProvider({ children }) {
       if (!response.ok) {
         const errorData = await response.text()
         console.error('API Error:', errorData)
-        throw new Error('Échec de la confirmation de connexion')
+        throw new Error('Failed to confirm connection')
       }
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur confirmation connexion:', error)
+      console.error('Error confirming connection:', error)
       throw error
     }
   }
@@ -274,12 +274,12 @@ export function WalletProvider({ children }) {
       if (!response.ok) {
         const errorText = await response.text()
         console.error('DepositFunds: API error', { status: response.status, error: errorText })
-        throw new Error(`Échec du dépôt: ${response.status} - ${errorText}`)
+        throw new Error(`Deposit failed: ${response.status} - ${errorText}`)
       }
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur dépôt:', error)
+      console.error('Deposit error:', error)
       throw error
     }
   }
@@ -299,12 +299,12 @@ export function WalletProvider({ children }) {
       })
 
       if (!response.ok) {
-        throw new Error('Échec du retrait')
+        throw new Error('Withdrawal failed')
       }
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur retrait:', error)
+      console.error('Withdrawal error:', error)
       throw error
     }
   }
@@ -315,14 +315,14 @@ export function WalletProvider({ children }) {
 
       if (!response.ok) {
         if (response.status === 404) {
-          return null // Pas encore de wallet connecté
+          return null // No wallet connected yet
         }
-        throw new Error('Échec de la récupération des infos wallet')
+        throw new Error('Failed to retrieve wallet info')
       }
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur récupération wallet info:', error)
+      console.error('Error retrieving wallet info:', error)
       throw error
     }
   }
@@ -337,12 +337,12 @@ export function WalletProvider({ children }) {
       const response = await fetch(url)
 
       if (!response.ok) {
-        throw new Error('Échec de la récupération de l\'historique')
+        throw new Error('Failed to retrieve history')
       }
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur historique transactions:', error)
+      console.error('Transaction history error:', error)
       throw error
     }
   }
@@ -352,19 +352,19 @@ export function WalletProvider({ children }) {
       const response = await fetch(`${LENDER_API_URL}/wallet/${agentId}/balance`)
 
       if (!response.ok) {
-        throw new Error('Échec de la récupération du solde')
+        throw new Error('Failed to retrieve balance')
       }
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur récupération solde:', error)
+      console.error('Error retrieving balance:', error)
       throw error
     }
   }
 
   const sendTransaction = async (to, amount, data = '0x') => {
     if (!signer) {
-      throw new Error('Wallet non connecté')
+      throw new Error('Wallet not connected')
     }
 
     try {
@@ -377,13 +377,13 @@ export function WalletProvider({ children }) {
       const transaction = await signer.sendTransaction(tx)
       return transaction
     } catch (error) {
-      console.error('Erreur envoi transaction:', error)
+      console.error('Error sending transaction:', error)
       throw error
     }
   }
 
   const value = {
-    // État du wallet
+    // Wallet state
     account,
     provider,
     signer,
@@ -393,14 +393,14 @@ export function WalletProvider({ children }) {
     chainId,
     error,
 
-    // Actions du wallet
+    // Wallet actions
     connectWallet,
     disconnect,
     switchToCapxTestnetNetwork,
     updateBalance,
     sendTransaction,
 
-    // Intégration Agent Lender
+    // Lender Agent Integration
     initiateWalletConnection,
     confirmWalletConnection,
     depositFunds,
@@ -409,7 +409,7 @@ export function WalletProvider({ children }) {
     getTransactionHistory,
     getAgentFundsBalance,
 
-    // Utilitaires
+    // Utilities
     isCapxTestnet: chainId === '756',
     formatBalance: (bal) => parseFloat(bal || 0).toFixed(4),
   }
@@ -420,7 +420,7 @@ export function WalletProvider({ children }) {
 export function useWallet() {
   const context = useContext(WalletContext)
   if (context === undefined) {
-    throw new Error('useWallet doit être utilisé dans un WalletProvider')
+    throw new Error('useWallet must be used within a WalletProvider')
   }
   return context
 }

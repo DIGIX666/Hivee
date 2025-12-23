@@ -166,9 +166,9 @@ def process_loan_request(agent_id):
 
         if result.get('terms'):
             terms = result['terms']
-            print(f"   Amount: ${terms.get('amount', 0):,.2f}")
+            print(f"   Amount: {terms.get('amount', 0):,.2f} CAPX")
             print(f"   Interest: {terms.get('interest_rate', 0)}%")
-            print(f"   Expected Return: ${terms.get('expected_return', 0):,.2f}")
+            print(f"   Expected Return: {terms.get('expected_return', 0):,.2f} CAPX")
 
         return result
     else:

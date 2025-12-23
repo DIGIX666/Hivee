@@ -54,7 +54,7 @@ You are a Senior Risk Analyst with 15+ years of experience in DeFi lending proto
 Analyze this loan application for financial risks:
 
 LOAN DETAILS:
-- Amount: ${loan_data.get('amount', 0):,}
+- Amount: {loan_data.get('amount', 0):,} CAPX
 - Interest Rate: {loan_data.get('interest_rate', 0)}%
 - Duration: {loan_data.get('duration_days', 0)} days
 - Credit Score: {loan_data.get('credit_score', 0)}/1000 (ERC-8004)
@@ -62,10 +62,10 @@ LOAN DETAILS:
 - Purpose: {loan_data.get('purpose', 'Not specified')}
 
 LENDER CONFIG:
-- Max Loan: ${lender_config.get('max_loan_amount', 0):,}
+- Max Loan: {lender_config.get('max_loan_amount', 0):,} CAPX
 - Min Credit Score: {lender_config.get('min_credit_score', 0)}/1000
 - Risk Tolerance: {lender_config.get('risk_tolerance', 'medium')}
-- Available Capital: ${lender_config.get('available_capital', 0):,}
+- Available Capital: {lender_config.get('available_capital', 0):,} CAPX
 
 Provide your risk assessment as JSON:
 {{
@@ -117,7 +117,7 @@ PREVIOUS RISK ANALYSIS:
 
 BORROWER PROFILE:
 - Credit Score: {loan_data.get('credit_score', 0)}/1000
-- Loan Amount: ${loan_data.get('amount', 0):,}
+- Loan Amount: {loan_data.get('amount', 0):,} CAPX
 - Interest Rate: {loan_data.get('interest_rate', 0)}%
 
 Provide your credit evaluation as JSON:
@@ -171,13 +171,13 @@ CREDIT EVALUATION:
 - Repayment Probability: {credit_evaluation.get('repayment_probability', 75)}%
 
 LOAN DETAILS:
-- Amount: ${loan_data.get('amount', 0):,}
+- Amount: {loan_data.get('amount', 0):,} CAPX
 - Interest Rate: {loan_data.get('interest_rate', 0)}%
 - Borrower Credit Score: {loan_data.get('credit_score', 0)}
 
 LENDER SETTINGS:
 - Risk Tolerance: {lender_config.get('risk_tolerance', 'medium')}
-- Available Capital: ${lender_config.get('available_capital', 0):,}
+- Available Capital: {lender_config.get('available_capital', 0):,} CAPX
 
 Make your final decision as JSON:
 {{
@@ -276,5 +276,5 @@ Decision options: APPROVE, REJECT, MANUAL_REVIEW
                 "evaluation_method": "fallback_crewai_simulation",
                 "note": "AI workflow failed, using fallback analysis"
             },
-            "reasoning": f"Fallback analysis: Credit {credit_score}, Amount ${amount:,}"
+            "reasoning": f"Fallback analysis: Credit {credit_score}, Amount {amount:,} CAPX"
         }

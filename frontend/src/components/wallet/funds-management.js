@@ -47,7 +47,7 @@ import {
   Eye
 } from 'lucide-react'
 
-export function FundsManagement({ agentId, agentName = "Agent", compact = false }) {
+export function FundsManagement({ agentId, agentName = "Agent", compact = false, onBalanceUpdate }) {
   const {
     account,
     connected,
@@ -99,7 +99,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
         loadTransactionHistory()
       ])
     } catch (error) {
-      console.error('Erreur lors du chargement des données:', error)
+      console.error('Error loading data:', error)
     }
     setLoading(false)
   }
@@ -109,7 +109,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
       const info = await getAgentWalletInfo(agentId)
       setWalletInfo(info)
     } catch (error) {
-      console.error('Erreur wallet info:', error)
+      console.error('Wallet info error:', error)
       setWalletInfo(null)
     }
   }
@@ -118,8 +118,25 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
     try {
       const info = await getAgentFundsBalance(agentId)
       setBalanceInfo(info)
+
+      // Notify parent of new balance
+      if (onBalanceUpdate && info) {
+        // Try different possible fields
+        let balance = 0
+        if (info.balance !== undefined) {
+          balance = parseFloat(info.balance)
+        } else if (info.total_balance !== undefined) {
+          balance = parseFloat(info.total_balance)
+        } else if (info.available_balance !== undefined) {
+          balance = parseFloat(info.available_balance)
+        } else if (typeof info === 'number') {
+          balance = info
+        }
+
+        onBalanceUpdate(balance)
+      }
     } catch (error) {
-      console.error('Erreur balance info:', error)
+      console.error('Balance info error:', error)
       setBalanceInfo(null)
     }
   }
@@ -129,7 +146,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
       const history = await getTransactionHistory(agentId)
       setTransactions(history.transactions || [])
     } catch (error) {
-      console.error('Erreur historique:', error)
+      console.error('History error:', error)
       setTransactions([])
     }
   }
@@ -141,18 +158,18 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
 
     setIsConnectingWallet(true)
     try {
-      // Initier la connexion
+      // Initiate connection
       const session = await initiateWalletConnection(agentId)
       setConnectionSession(session)
 
-      // Confirmer automatiquement avec l'adresse connectée
+      // Automatically confirm with connected address
       await confirmWalletConnection(session.session_id, account)
 
-      // Recharger les données
+      // Reload data
       await loadData()
       setConnectionSession(null)
     } catch (error) {
-      console.error('Erreur connexion wallet agent:', error)
+      console.error('Wallet agent connection error:', error)
     }
     setIsConnectingWallet(false)
   }
@@ -162,23 +179,23 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
 
     setDepositLoading(true)
     try {
-      // D'abord envoyer la transaction on-chain (simulation)
-      // Dans un vrai cas, on enverrait vers l'adresse de l'agent
+      // First send on-chain transaction (simulation)
+      // In a real case, we would send to the agent's address
       const tx = await sendTransaction(
-        '0x1234567890abcdef1234567890abcdef12345678', // Adresse agent simulée
+        '0x1234567890abcdef1234567890abcdef12345678', // Simulated agent address
         depositAmount
       )
 
-      // Ensuite enregistrer le dépôt dans l'API
+      // Then register the deposit in the API
       await depositFunds(agentId, depositAmount, tx.hash)
 
-      // Recharger les données
+      // Reload data
       await loadData()
 
       setDepositAmount('')
       setIsDepositModalOpen(false)
     } catch (error) {
-      console.error('Erreur dépôt:', error)
+      console.error('Deposit error:', error)
     }
     setDepositLoading(false)
   }
@@ -190,14 +207,14 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
     try {
       await withdrawFunds(agentId, withdrawAmount, withdrawAddress || account)
 
-      // Recharger les données
+      // Reload data
       await loadData()
 
       setWithdrawAmount('')
       setWithdrawAddress('')
       setIsWithdrawModalOpen(false)
     } catch (error) {
-      console.error('Erreur retrait:', error)
+      console.error('Withdrawal error:', error)
     }
     setWithdrawLoading(false)
   }
@@ -218,13 +235,13 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
   const getStatusBadge = (status) => {
     switch (status) {
       case 'confirmed':
-        return <Badge variant="success">Confirmé</Badge>
+        return <Badge variant="success">Confirmed</Badge>
       case 'pending':
-        return <Badge variant="warning">En attente</Badge>
+        return <Badge variant="warning">Pending</Badge>
       case 'failed':
-        return <Badge variant="destructive">Échoué</Badge>
+        return <Badge variant="destructive">Failed</Badge>
       default:
-        return <Badge variant="outline">Inconnu</Badge>
+        return <Badge variant="outline">Unknown</Badge>
     }
   }
 
@@ -237,7 +254,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
             Connect Wallet
           </Button>
           <p className="text-xs text-muted-foreground mt-2">
-            Connectez votre wallet pour gérer les fonds
+            Connect your wallet to manage funds
           </p>
         </div>
       )
@@ -247,9 +264,9 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
         <CardContent className="p-6">
           <div className="text-center">
             <Wallet className="h-8 w-8 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="font-semibold mb-2">Wallet non connecté</h3>
+            <h3 className="font-semibold mb-2">Wallet not connected</h3>
             <p className="text-sm text-muted-foreground">
-              Connectez votre wallet pour gérer les fonds de cet agent
+              Connect your wallet to manage this agent's funds
             </p>
           </div>
         </CardContent>
@@ -266,7 +283,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
             Wrong Network
           </Button>
           <p className="text-xs text-muted-foreground mt-2">
-            Changez vers CapX Testnet
+            Switch to CapX Testnet
           </p>
         </div>
       )
@@ -276,9 +293,9 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
         <CardContent className="p-6">
           <div className="text-center">
             <AlertCircle className="h-8 w-8 mx-auto mb-4 text-amber-500" />
-            <h3 className="font-semibold mb-2">Réseau incorrect</h3>
+            <h3 className="font-semibold mb-2">Incorrect Network</h3>
             <p className="text-sm text-muted-foreground">
-              Veuillez vous connecter au réseau CapX Testnet pour continuer
+              Please connect to CapX Testnet network to continue
             </p>
           </div>
         </CardContent>
@@ -298,7 +315,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
               className="w-full"
             >
               <Wallet className="h-4 w-4 mr-2" />
-              {isConnectingWallet ? 'Connexion...' : 'Connect to Agent'}
+              {isConnectingWallet ? 'Connecting...' : 'Connect to Agent'}
             </Button>
           </div>
         ) : (
@@ -322,11 +339,11 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="text-center p-3 bg-muted/50 rounded-lg">
                       <div className="text-sm font-bold truncate">{formatBalance(balanceInfo.available_capital)}</div>
-                      <div className="text-xs text-muted-foreground">Capital Dispo.</div>
+                      <div className="text-xs text-muted-foreground">Avail. Capital</div>
                     </div>
                     <div className="text-center p-3 bg-muted/50 rounded-lg">
                       <div className="text-sm font-bold truncate">{formatBalance(balanceInfo.total_earnings)}</div>
-                      <div className="text-xs text-muted-foreground">Gains</div>
+                      <div className="text-xs text-muted-foreground">Earnings</div>
                     </div>
                   </div>
                 )}
@@ -336,16 +353,16 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                     <DialogTrigger asChild>
                       <Button className="flex items-center justify-center gap-2">
                         <ArrowUpCircle className="h-4 w-4" />
-                        Déposer des fonds
+                        Deposit Funds
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Déposer des fonds</DialogTitle>
+                        <DialogTitle>Deposit Funds</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <Label htmlFor="deposit-amount">Montant (CAPX)</Label>
+                          <Label htmlFor="deposit-amount">Amount (CAPX)</Label>
                           <Input
                             id="deposit-amount"
                             type="number"
@@ -358,10 +375,10 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                         </div>
                         <div className="flex gap-2 justify-end">
                           <Button variant="outline" onClick={() => setIsDepositModalOpen(false)}>
-                            Annuler
+                            Cancel
                           </Button>
                           <Button onClick={handleDeposit} disabled={depositLoading || !depositAmount}>
-                            {depositLoading ? 'En cours...' : 'Déposer'}
+                            {depositLoading ? 'Processing...' : 'Deposit'}
                           </Button>
                         </div>
                       </div>
@@ -372,16 +389,16 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                     <DialogTrigger asChild>
                       <Button variant="outline" className="flex items-center justify-center gap-2">
                         <ArrowDownCircle className="h-4 w-4" />
-                        Retirer des fonds
+                        Withdraw Funds
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Retirer des fonds</DialogTitle>
+                        <DialogTitle>Withdraw Funds</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <Label htmlFor="withdraw-amount">Montant (CAPX)</Label>
+                          <Label htmlFor="withdraw-amount">Amount (CAPX)</Label>
                           <Input
                             id="withdraw-amount"
                             type="number"
@@ -394,10 +411,10 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                         </div>
                         <div className="flex gap-2 justify-end">
                           <Button variant="outline" onClick={() => setIsWithdrawModalOpen(false)}>
-                            Annuler
+                            Cancel
                           </Button>
                           <Button onClick={handleWithdraw} disabled={withdrawLoading || !withdrawAmount}>
-                            {withdrawLoading ? 'En cours...' : 'Retirer'}
+                            {withdrawLoading ? 'Processing...' : 'Withdraw'}
                           </Button>
                         </div>
                       </div>
@@ -414,55 +431,55 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
 
   return (
     <div className="space-y-6">
-      {/* En-tête de gestion des fonds */}
+      {/* Funds management header */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="h-5 w-5" />
-            Gestion des fonds - {agentName}
+            Funds Management - {agentName}
           </CardTitle>
           <CardDescription>
-            Déposez ou retirez des fonds pour alimenter votre agent de prêt autonome
+            Deposit or withdraw funds to power your autonomous lending agent
           </CardDescription>
         </CardHeader>
       </Card>
 
-      {/* Informations sur le solde */}
+      {/* Balance information */}
       {balanceInfo && (
         <Card>
           <CardContent className="p-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="text-center p-3 bg-muted/50 rounded-lg">
                 <div className="text-lg sm:text-xl font-bold truncate">{formatBalance(balanceInfo.wallet_balance)}</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">Balance Wallet</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Wallet Balance</div>
               </div>
               <div className="text-center p-3 bg-muted/50 rounded-lg">
                 <div className="text-lg sm:text-xl font-bold truncate">{formatBalance(balanceInfo.available_capital)}</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">Capital Disponible</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Available Capital</div>
               </div>
               <div className="text-center p-3 bg-muted/50 rounded-lg">
                 <div className="text-lg sm:text-xl font-bold truncate">{formatBalance(balanceInfo.total_amount_lent)}</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">Total Prêté</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Total Lent</div>
               </div>
               <div className="text-center p-3 bg-muted/50 rounded-lg">
                 <div className="text-lg sm:text-xl font-bold truncate">{formatBalance(balanceInfo.total_earnings)}</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">Gains Totaux</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Total Earnings</div>
               </div>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Actions principales */}
+      {/* Main actions */}
       <Card>
         <CardContent className="p-6">
           {!walletInfo ? (
-            // Pas encore de wallet connecté à l'agent
+            // No wallet connected to agent yet
             <div className="text-center space-y-4">
               <div>
-                <h3 className="font-semibold mb-2">Connecter le wallet à l'agent</h3>
+                <h3 className="font-semibold mb-2">Connect wallet to agent</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Connectez votre wallet à cet agent pour commencer à gérer les fonds
+                  Connect your wallet to this agent to start managing funds
                 </p>
               </div>
               <Button
@@ -471,30 +488,30 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                 className="flex items-center gap-2"
               >
                 <Wallet className="h-4 w-4" />
-                {isConnectingWallet ? 'Connexion...' : 'Connecter à l\'agent'}
+                {isConnectingWallet ? 'Connecting...' : 'Connect to Agent'}
               </Button>
             </div>
           ) : (
-            // Wallet connecté, actions disponibles
+            // Wallet connected, actions available
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Dialog open={isDepositModalOpen} onOpenChange={setIsDepositModalOpen}>
                 <DialogTrigger asChild>
                   <Button className="flex items-center justify-center gap-2 w-full sm:w-auto">
                     <ArrowUpCircle className="h-4 w-4" />
-                    <span className="hidden sm:inline">Déposer des fonds</span>
-                    <span className="sm:hidden">Déposer</span>
+                    <span className="hidden sm:inline">Deposit Funds</span>
+                    <span className="sm:hidden">Deposit</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Déposer des fonds</DialogTitle>
+                    <DialogTitle>Deposit Funds</DialogTitle>
                     <DialogDescription>
-                      Ajoutez des fonds à votre agent pour augmenter son capital de prêt
+                      Add funds to your agent to increase its lending capital
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="deposit-amount">Montant (CAPX)</Label>
+                      <Label htmlFor="deposit-amount">Amount (CAPX)</Label>
                       <Input
                         id="deposit-amount"
                         type="number"
@@ -510,13 +527,13 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                         variant="outline"
                         onClick={() => setIsDepositModalOpen(false)}
                       >
-                        Annuler
+                        Cancel
                       </Button>
                       <Button
                         onClick={handleDeposit}
                         disabled={depositLoading || !depositAmount}
                       >
-                        {depositLoading ? 'En cours...' : 'Déposer'}
+                        {depositLoading ? 'Processing...' : 'Deposit'}
                       </Button>
                     </div>
                   </div>
@@ -527,20 +544,20 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                 <DialogTrigger asChild>
                   <Button variant="outline" className="flex items-center justify-center gap-2 w-full sm:w-auto">
                     <ArrowDownCircle className="h-4 w-4" />
-                    <span className="hidden sm:inline">Retirer des fonds</span>
-                    <span className="sm:hidden">Retirer</span>
+                    <span className="hidden sm:inline">Withdraw Funds</span>
+                    <span className="sm:hidden">Withdraw</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Retirer des fonds</DialogTitle>
+                    <DialogTitle>Withdraw Funds</DialogTitle>
                     <DialogDescription>
-                      Retirez des fonds de votre agent vers votre wallet
+                      Withdraw funds from your agent to your wallet
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="withdraw-amount">Montant (CAPX)</Label>
+                      <Label htmlFor="withdraw-amount">Amount (CAPX)</Label>
                       <Input
                         id="withdraw-amount"
                         type="number"
@@ -551,11 +568,11 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                         step="0.001"
                       />
                       <div className="text-xs text-muted-foreground mt-1">
-                        Capital disponible: {formatBalance(balanceInfo?.available_capital || 0)} CAPX
+                        Available capital: {formatBalance(balanceInfo?.available_capital || 0)} CAPX
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="withdraw-address">Adresse de destination (optionnel)</Label>
+                      <Label htmlFor="withdraw-address">Destination address (optional)</Label>
                       <Input
                         id="withdraw-address"
                         type="text"
@@ -569,13 +586,13 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                         variant="outline"
                         onClick={() => setIsWithdrawModalOpen(false)}
                       >
-                        Annuler
+                        Cancel
                       </Button>
                       <Button
                         onClick={handleWithdraw}
                         disabled={withdrawLoading || !withdrawAmount}
                       >
-                        {withdrawLoading ? 'En cours...' : 'Retirer'}
+                        {withdrawLoading ? 'Processing...' : 'Withdraw'}
                       </Button>
                     </div>
                   </div>
@@ -589,7 +606,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                 className="flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                <span className="hidden sm:inline">Actualiser</span>
+                <span className="hidden sm:inline">Refresh</span>
                 <span className="sm:hidden">↻</span>
               </Button>
 
@@ -597,22 +614,22 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                 <DialogTrigger asChild>
                   <Button variant="outline" className="flex items-center justify-center gap-2 w-full sm:w-auto">
                     <History className="h-4 w-4" />
-                    <span className="hidden sm:inline">Historique</span>
+                    <span className="hidden sm:inline">History</span>
                     <span className="sm:hidden">Hist.</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl">
                   <DialogHeader>
-                    <DialogTitle>Historique des transactions</DialogTitle>
+                    <DialogTitle>Transaction History</DialogTitle>
                     <DialogDescription>
-                      Toutes les transactions de dépôt et retrait pour cet agent
+                      All deposit and withdrawal transactions for this agent
                     </DialogDescription>
                   </DialogHeader>
                   <div className="max-h-96 overflow-y-auto">
                     {transactions.length === 0 ? (
                       <div className="text-center py-8">
                         <History className="h-8 w-8 mx-auto mb-4 text-muted-foreground" />
-                        <p className="text-muted-foreground">Aucune transaction trouvée</p>
+                        <p className="text-muted-foreground">No transactions found</p>
                       </div>
                     ) : (
                       <div className="space-y-4">
@@ -628,7 +645,7 @@ export function FundsManagement({ agentId, agentName = "Agent", compact = false 
                                   )}
                                   <div>
                                     <div className="font-semibold">
-                                      {tx.transaction_type === 'deposit' ? 'Dépôt' : 'Retrait'}
+                                      {tx.transaction_type === 'deposit' ? 'Deposit' : 'Withdrawal'}
                                     </div>
                                     <div className="text-sm text-muted-foreground">
                                       {new Date(tx.created_at).toLocaleString()}

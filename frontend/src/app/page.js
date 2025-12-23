@@ -19,19 +19,23 @@ export default function HomePage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  // États pour le dépôt automatique après création
+  // States for automatic deposit after creation
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false)
   const [newlyCreatedAgent, setNewlyCreatedAgent] = useState(null)
   const [depositAmount, setDepositAmount] = useState('')
   const [depositLoading, setDepositLoading] = useState(false)
 
-  // Hook wallet
+  // State for real agent balances
+  const [agentBalances, setAgentBalances] = useState({})
+
+  // Wallet hook
   const {
     connected,
     isCapxTestnet,
     depositFunds,
     sendTransaction,
-    account
+    account,
+    getAgentFundsBalance
   } = useWallet()
 
   // Simplified API calls
@@ -55,6 +59,12 @@ export default function HomePage() {
     }
   }
 
+  // Function kept but unused - replaced by callback
+  const fetchAgentBalances = async () => {
+    // This function is now replaced by the onBalanceUpdate callback
+    return
+  }
+
   const createAgent = async (agentData) => {
     try {
       setLoading(true)
@@ -70,11 +80,11 @@ export default function HomePage() {
         fetchStats()
         setIsCreateModalOpen(false)
 
-        // Si le wallet est connecté et on est sur le bon réseau, proposer le dépôt automatique
+        // If wallet is connected and we're on the right network, offer automatic deposit
         if (connected && isCapxTestnet && agentData.config.available_capital > 0) {
           setNewlyCreatedAgent(newAgent)
-          // Convertir le capital en CAPX (pour la démo: 1 USD ≈ 0.01 CAPX, ajustable selon le taux de change)
-          const capitalInCAPX = (agentData.config.available_capital * 0.01).toFixed(4)
+          // Capital is already in CAPX
+          const capitalInCAPX = agentData.config.available_capital.toFixed(4)
           setDepositAmount(capitalInCAPX)
           setIsDepositModalOpen(true)
         }
@@ -88,31 +98,32 @@ export default function HomePage() {
     }
   }
 
-  // Fonction pour effectuer le dépôt automatique
+  // Function to perform automatic deposit
   const handleAutomaticDeposit = async () => {
     if (!newlyCreatedAgent || !depositAmount || !account) return
 
     setDepositLoading(true)
     try {
-      // D'abord envoyer la transaction on-chain (simulation vers adresse agent)
+      // First send on-chain transaction (simulation to agent address)
       const tx = await sendTransaction(
-        '0x1234567890abcdef1234567890abcdef12345678', // Adresse agent simulée
+        '0x1234567890abcdef1234567890abcdef12345678', // Simulated agent address
         depositAmount
       )
 
-      // Ensuite enregistrer le dépôt dans l'API
+      // Then register the deposit in the API
       await depositFunds(newlyCreatedAgent.id, depositAmount, tx.hash)
 
-      // Fermer la modale et réinitialiser
+      // Close modal and reset
       setIsDepositModalOpen(false)
       setNewlyCreatedAgent(null)
       setDepositAmount('')
 
-      // Actualiser les données
+      // Refresh data
       fetchAgents()
       fetchStats()
+      // fetchAgentBalances() - handled by callback now
     } catch (error) {
-      console.error('Erreur dépôt automatique:', error)
+      console.error('Automatic deposit error:', error)
     }
     setDepositLoading(false)
   }
@@ -128,13 +139,20 @@ export default function HomePage() {
     fetchStats()
   }, [])
 
+  // Commented to avoid conflict with callback
+  // useEffect(() => {
+  //   if (agents.length > 0 && connected) {
+  //     fetchAgentBalances()
+  //   }
+  // }, [agents, connected])
+
   return (
     <MainLayout>
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
         <div className="container mx-auto px-6 py-8">
           <div className="text-center space-y-6 mb-8">
             <h2 className="text-2xl font-bold text-foreground">
-              AI Agent Management avec WalletConnect
+              AI Agent Management with WalletConnect
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
               Deploy and manage autonomous lending agents on the CapX Testnet
@@ -189,7 +207,7 @@ export default function HomePage() {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="capital">Available Capital (USD)</Label>
+                        <Label htmlFor="capital">Available Capital (CAPX)</Label>
                         <Input
                           id="capital"
                           name="capital"
@@ -201,7 +219,7 @@ export default function HomePage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="max_loan">Max Loan Amount ($)</Label>
+                        <Label htmlFor="max_loan">Max Loan Amount (CAPX)</Label>
                         <Input
                           id="max_loan"
                           name="max_loan"
@@ -258,7 +276,7 @@ export default function HomePage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="fixed_fee">Fixed Fee ($)</Label>
+                        <Label htmlFor="fixed_fee">Fixed Fee (CAPX)</Label>
                         <Input
                           id="fixed_fee"
                           name="fixed_fee"
@@ -304,32 +322,32 @@ export default function HomePage() {
               </DialogContent>
             </Dialog>
 
-            {/* Modale de dépôt automatique après création d'agent */}
+            {/* Automatic deposit modal after agent creation */}
             <Dialog open={isDepositModalOpen} onOpenChange={setIsDepositModalOpen}>
               <DialogContent className="max-w-md">
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2">
                     <Wallet className="h-5 w-5" />
-                    Financer votre agent
+                    Fund your agent
                   </DialogTitle>
                   <DialogDescription>
-                    Votre agent <strong>{newlyCreatedAgent?.name}</strong> a été créé avec succès !
-                    Voulez-vous déposer le capital initial maintenant ?
+                    Your agent <strong>{newlyCreatedAgent?.name}</strong> has been created successfully!
+                    Do you want to deposit the initial capital now?
                   </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-4">
                   <div className="bg-muted/50 rounded-lg p-4">
-                    <div className="text-sm text-muted-foreground">Capital configuré</div>
+                    <div className="text-sm text-muted-foreground">Configured capital</div>
                     <div className="text-xl font-bold">{depositAmount} CAPX</div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      (~${newlyCreatedAgent?.config?.available_capital || 0} USD)
+                      (Capital configured in CAPX)
                     </div>
                   </div>
 
                   <div className="text-sm text-muted-foreground">
-                    Ce montant sera déposé depuis votre wallet connecté vers votre agent
-                    pour qu'il puisse commencer à prêter de manière autonome.
+                    This amount will be deposited from your connected wallet to your agent
+                    so it can start lending autonomously.
                   </div>
 
                   <div className="flex gap-3">
@@ -339,20 +357,20 @@ export default function HomePage() {
                       disabled={depositLoading}
                       className="flex-1"
                     >
-                      Plus tard
+                      Later
                     </Button>
                     <Button
                       onClick={handleAutomaticDeposit}
                       disabled={depositLoading || !connected || !isCapxTestnet}
                       className="flex-1"
                     >
-                      {depositLoading ? 'Dépôt...' : 'Déposer maintenant'}
+                      {depositLoading ? 'Depositing...' : 'Deposit now'}
                     </Button>
                   </div>
 
                   {(!connected || !isCapxTestnet) && (
                     <div className="text-xs text-amber-600 bg-amber-50 p-2 rounded">
-                      ⚠️ Wallet non connecté ou réseau incorrect. Connectez-vous au réseau CapX Testnet.
+                      ⚠️ Wallet not connected or incorrect network. Connect to CapX Testnet network.
                     </div>
                   )}
                 </div>
@@ -369,7 +387,7 @@ export default function HomePage() {
                   Test WalletConnect
                 </CardTitle>
                 <CardDescription>
-                  Connectez votre wallet MetaMask pour tester l'intégration CapX Testnet
+                  Connect your MetaMask wallet to test CapX Testnet integration
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -388,19 +406,19 @@ export default function HomePage() {
                 </div>
                 <div className="card-gradient rounded-lg p-4 text-center">
                   <div className="text-xl font-bold text-foreground">
-                    ${(stats.total_available_capital || 0).toLocaleString()}
+                    {(stats.total_available_capital || 0).toLocaleString()} CAPX
                   </div>
                   <div className="text-sm text-muted-foreground">Available Capital</div>
                 </div>
                 <div className="card-gradient rounded-lg p-4 text-center">
                   <div className="text-xl font-bold text-foreground">
-                    ${(stats.total_amount_lent || 0).toLocaleString()}
+                    {(stats.total_amount_lent || 0).toLocaleString()} CAPX
                   </div>
                   <div className="text-sm text-muted-foreground">Total Lent</div>
                 </div>
                 <div className="card-gradient rounded-lg p-4 text-center">
                   <div className="text-xl font-bold text-foreground">
-                    ${(stats.total_earnings || 0).toLocaleString()}
+                    {(stats.total_earnings || 0).toLocaleString()} CAPX
                   </div>
                   <div className="text-sm text-muted-foreground">Total Earnings</div>
                 </div>
@@ -434,10 +452,19 @@ export default function HomePage() {
                     <div className="text-lg font-semibold">{agent.name}</div>
                     <div className="text-sm text-muted-foreground">ID: {agent.id.slice(0, 8)}...</div>
                     <div className="mt-2 mb-3">
-                      <span className="text-sm">Capital: ${(agent.config?.available_capital || 0).toLocaleString()}</span>
+                      <span className="text-sm">
+                        Capital: {(agentBalances[agent.id] !== undefined ? agentBalances[agent.id] : (agent.config?.available_capital || 0)).toLocaleString()} CAPX
+                      </span>
                     </div>
                     <div className="mt-3">
-                      <FundsManagement agentId={agent.id} agentName={agent.name} compact={true} />
+                      <FundsManagement
+                        agentId={agent.id}
+                        agentName={agent.name}
+                        compact={true}
+                        onBalanceUpdate={(balance) => {
+                          setAgentBalances(prev => ({...prev, [agent.id]: balance}))
+                        }}
+                      />
                     </div>
                   </div>
                 ))
