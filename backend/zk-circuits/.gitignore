@@ -1,0 +1,19 @@
+# Build artifacts
+build/
+keys/
+node_modules/
+
+# Proof files
+*.ptau
+inputs.json
+proof.json
+public.json
+temp_proof.json
+temp_public.json
+test_inputs.json
+test_proof.json
+test_public.json
+
+# Verifier contract
+verifier.sol
+TaskProofVerifier.sol
