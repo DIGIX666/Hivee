@@ -37,7 +37,7 @@ This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENS
 
 ## Links
 - **App**: [Soon!](#)
-- **Twitter**: [@Hivee](#)
+- **Pitch Deck**: [Hivee](https://www.canva.com/design/DAG8POlz53o/a1xwl48tKbxrd23bDK1acw/view?utm_content=DAG8POlz53o&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h0c5a138bed)
 
 ## Acknowledgments
 
