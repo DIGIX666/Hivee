@@ -1,0 +1,355 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { MainLayout } from '@/components/layout/main-layout'
+import { StatsCard } from '@/components/ui/stats-card'
+import { AgentCard } from '@/components/ui/agent-card'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Plus, Bot } from 'lucide-react'
+
+export default function HomePage() {
+  const [agents, setAgents] = useState([])
+  const [stats, setStats] = useState(null)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [selectedAgent, setSelectedAgent] = useState(null)
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false)
+
+  // Simplified API calls
+  const fetchAgents = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/lenders')
+      const data = await response.json()
+      setAgents(data.agents || [])
+    } catch (error) {
+      console.error('Failed to fetch agents:', error)
+    }
+  }
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/stats')
+      const data = await response.json()
+      setStats(data)
+    } catch (error) {
+      console.error('Failed to fetch stats:', error)
+    }
+  }
+
+  const createAgent = async (agentData) => {
+    try {
+      const response = await fetch(`http://localhost:8000/lender/create?name=${encodeURIComponent(agentData.name)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(agentData.config),
+      })
+
+      if (response.ok) {
+        const newAgent = await response.json()
+        setAgents(prev => [...prev, newAgent])
+        fetchStats() // Refresh stats
+        setIsCreateModalOpen(false)
+      }
+    } catch (error) {
+      console.error('Failed to create agent:', error)
+    }
+  }
+
+  useEffect(() => {
+    fetchAgents()
+    fetchStats()
+  }, [])
+
+  const handleAgentAction = (action, agent) => {
+    console.log(`Action: ${action}`, agent)
+
+    switch (action) {
+      case 'wallet':
+        setSelectedAgent(agent)
+        setIsWalletModalOpen(true)
+        break
+      case 'view':
+        // Implement view details
+        console.log('View agent details:', agent)
+        break
+      case 'manage':
+        // Implement manage agent
+        setSelectedAgent(agent)
+        setIsWalletModalOpen(true)
+        break
+      default:
+        console.log('Action not implemented:', action)
+    }
+  }
+
+  return (
+    <MainLayout>
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+        {/* Hero Section simplifié */}
+        <div className="container mx-auto px-6 py-8">
+          <div className="text-center space-y-6 mb-8">
+            <h2 className="text-2xl font-bold text-foreground">
+              AI Agent Management
+            </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Deploy and manage autonomous lending agents on the CapX blockchain
+            </p>
+          </div>
+
+          {/* Action Section simplifié */}
+          <div className="flex justify-center mb-8">
+            <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  size="lg"
+                  className="clickable btn-glow bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white border-0 shadow-lg"
+                >
+                  <Plus className="h-5 w-5 mr-2" />
+                  Deploy New Agent
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg bg-visible">
+                <DialogHeader>
+                  <DialogTitle className="text-visible text-xl">Deploy New AI Lending Agent</DialogTitle>
+                  <DialogDescription className="text-muted-foreground">
+                    Configure your autonomous lending agent parameters. The agent will operate independently using AI-driven risk assessment.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={(e) => {
+                  e.preventDefault()
+                  const formData = new FormData(e.target)
+                  createAgent({
+                    name: formData.get('name'),
+                    config: {
+                      available_capital: parseFloat(formData.get('capital')),
+                      max_loan_amount: parseFloat(formData.get('max_loan')),
+                      min_credit_score: parseInt(formData.get('min_score')),
+                      base_interest_rate: parseFloat(formData.get('interest')),
+                      credit_fee_percentage: parseFloat(formData.get('fee_percent')),
+                      fixed_processing_fee: parseFloat(formData.get('fixed_fee')),
+                      risk_tolerance: formData.get('risk')
+                    }
+                  })
+                }} className="space-y-6">
+                  <div className="grid gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="text-visible text-sm font-medium">Agent Name</Label>
+                      <Input
+                        id="name"
+                        name="name"
+                        type="text"
+                        placeholder="e.g., Conservative Lender Alpha"
+                        required
+                        className="bg-input border-border text-foreground placeholder:text-muted-foreground"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="capital" className="text-visible text-sm font-medium">Available Capital ($)</Label>
+                        <Input
+                          id="capital"
+                          name="capital"
+                          type="number"
+                          placeholder="50000"
+                          min="100"
+                          step="100"
+                          required
+                          className="bg-input border-border text-foreground placeholder:text-muted-foreground"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="max_loan" className="text-visible text-sm font-medium">Max Loan Amount ($)</Label>
+                        <Input
+                          id="max_loan"
+                          name="max_loan"
+                          type="number"
+                          placeholder="10000"
+                          min="100"
+                          step="100"
+                          required
+                          className="bg-input border-border text-foreground placeholder:text-muted-foreground"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="min_score" className="text-visible text-sm font-medium">Min Credit Score</Label>
+                        <Input
+                          id="min_score"
+                          name="min_score"
+                          type="number"
+                          placeholder="650"
+                          min="300"
+                          max="850"
+                          defaultValue="650"
+                          required
+                          className="bg-input border-border text-foreground placeholder:text-muted-foreground"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="interest" className="text-visible text-sm font-medium">Interest Rate (%)</Label>
+                        <Input
+                          id="interest"
+                          name="interest"
+                          type="number"
+                          placeholder="8.0"
+                          min="0.1"
+                          max="50"
+                          step="0.1"
+                          defaultValue="8.0"
+                          required
+                          className="bg-input border-border text-foreground placeholder:text-muted-foreground"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="fee_percent" className="text-visible text-sm font-medium">Fee Percentage (%)</Label>
+                        <Input
+                          id="fee_percent"
+                          name="fee_percent"
+                          type="number"
+                          placeholder="1.5"
+                          min="0"
+                          max="10"
+                          step="0.1"
+                          defaultValue="1.5"
+                          required
+                          className="bg-input border-border text-foreground placeholder:text-muted-foreground"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="fixed_fee" className="text-visible text-sm font-medium">Fixed Fee ($)</Label>
+                        <Input
+                          id="fixed_fee"
+                          name="fixed_fee"
+                          type="number"
+                          placeholder="25"
+                          min="0"
+                          defaultValue="25"
+                          required
+                          className="bg-input border-border text-foreground placeholder:text-muted-foreground"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="risk" className="text-visible text-sm font-medium">Risk Tolerance</Label>
+                      <Select name="risk" defaultValue="medium">
+                        <SelectTrigger className="bg-input border-border text-foreground">
+                          <SelectValue placeholder="Select risk tolerance" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-visible border-border">
+                          <SelectItem value="low" className="text-foreground hover:bg-accent">Conservative</SelectItem>
+                          <SelectItem value="medium" className="text-foreground hover:bg-accent">Balanced</SelectItem>
+                          <SelectItem value="high" className="text-foreground hover:bg-accent">Aggressive</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-3 pt-6 border-t border-border">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsCreateModalOpen(false)}
+                      className="clickable bg-transparent border-border text-foreground hover:bg-accent"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="clickable bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white border-0"
+                    >
+                      Deploy Agent
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+          </div>
+
+          {/* Stats simplifié */}
+          {stats && (
+            <div className="mb-8">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <div className="card-gradient rounded-lg p-4 text-center">
+                  <div className="text-xl font-bold text-foreground">{stats.total_agents}</div>
+                  <div className="text-sm text-muted-foreground">Total Agents</div>
+                </div>
+                <div className="card-gradient rounded-lg p-4 text-center">
+                  <div className="text-xl font-bold text-foreground">
+                    ${(stats.total_available_capital || 0).toLocaleString()}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Available Capital</div>
+                </div>
+                <div className="card-gradient rounded-lg p-4 text-center">
+                  <div className="text-xl font-bold text-foreground">
+                    ${(stats.total_amount_lent || 0).toLocaleString()}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Total Lent</div>
+                </div>
+                <div className="card-gradient rounded-lg p-4 text-center">
+                  <div className="text-xl font-bold text-foreground">
+                    ${(stats.total_earnings || 0).toLocaleString()}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Total Earnings</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Section des agents simplifié */}
+          <div>
+            <h3 className="text-lg font-semibold text-foreground mb-4 text-center">Your AI Agents</h3>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {agents.length === 0 ? (
+                <div className="col-span-full">
+                  <div className="card-gradient rounded-lg p-8 text-center border-dashed border-2 border-primary/20">
+                    <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mb-4 mx-auto">
+                      <Bot className="h-6 w-6 text-primary" />
+                    </div>
+                    <h4 className="text-lg font-semibold text-foreground mb-2">No agents deployed</h4>
+                    <p className="text-muted-foreground text-sm mb-6">
+                      Deploy your first AI agent to start automated lending
+                    </p>
+                    <Button
+                      onClick={() => setIsCreateModalOpen(true)}
+                      className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white border-0"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Deploy First Agent
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                agents.map((agent) => (
+                  <div key={agent.id} className="card-gradient rounded-lg p-4">
+                    <AgentCard
+                      agent={{
+                        ...agent,
+                        performance_score: Math.floor(Math.random() * 15) + 5
+                      }}
+                      onAction={handleAgentAction}
+                    />
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {loading && (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+              <span className="ml-2 text-muted-foreground text-sm">Loading...</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </MainLayout>
+  )
+}

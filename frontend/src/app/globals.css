@@ -1,26 +1,245 @@
 @import "tailwindcss";
+@plugin "tailwindcss-animate";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Dark theme - palette sombre harmonieuse */
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 5.9%;
+    --card-foreground: 0 0% 95%;
+    --popover: 240 10% 4.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 144 100% 4%;
+    --secondary: 240 4.8% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 5.9% 10%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 4.8% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 18%;
+    --input: 240 5.9% 10%;
+    --ring: 142 76% 36%;
+    --radius: 0.75rem;
+
+    /* Couleurs personnalisées pour Hivee */
+    --hivee-green: 142 76% 36%;
+    --hivee-green-dark: 142 76% 26%;
+    --hivee-green-light: 142 76% 46%;
+    --hivee-purple: 260 100% 70%;
+    --hivee-purple-dark: 260 100% 60%;
+    --hivee-blue: 220 100% 70%;
+    --hivee-orange: 25 95% 65%;
+    --hivee-yellow: 50 100% 70%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--hivee-green)) 0%, hsl(var(--hivee-blue)) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--hivee-purple)) 0%, hsl(var(--hivee-green)) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(var(--hivee-orange)) 0%, hsl(var(--hivee-yellow)) 100%);
+
+    /* Charts */
+    --chart-1: 142 76% 36%;
+    --chart-2: 260 100% 70%;
+    --chart-3: 220 100% 70%;
+    --chart-4: 25 95% 65%;
+    --chart-5: 50 100% 70%;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-geist-sans);
+  }
+
+  /* Assure la visibilité de tous les éléments clickables */
+  button, [role="button"], [tabindex], a, input, select, textarea {
+    cursor: pointer;
+  }
+
+  input[type="text"], input[type="number"], input[type="email"], textarea, select {
+    cursor: text;
+  }
+
+  /* Force la visibilité des modales et dialogs */
+  [role="dialog"], [data-radix-portal] {
+    background: hsl(var(--card)) !important;
+    border: 1px solid hsl(var(--border)) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  /* Style pour les overlays */
+  [data-radix-dialog-overlay] {
+    background: rgba(0, 0, 0, 0.6) !important;
+  }
+}
+
+/* Styles pour assurer la visibilité */
+@layer utilities {
+  .bg-visible {
+    background-color: hsl(var(--card)) !important;
+    border: 1px solid hsl(var(--border)) !important;
+  }
+
+  .text-visible {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .clickable {
+    cursor: pointer !important;
+    transition: all 0.2s ease;
+  }
+
+  .clickable:hover {
+    opacity: 0.8;
+    transform: translateY(-1px);
+  }
+
+  /* Animations fluides */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out;
+  }
+
+  /* Effet glassmorphism ajusté pour le thème sombre */
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Texte avec gradient */
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-secondary {
+    background: var(--gradient-secondary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-accent {
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Effet hover avec élévation */
+  .hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+  }
+
+  /* Boutons avec effet glow */
+  .btn-glow {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-glow::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s;
+  }
+
+  .btn-glow:hover::before {
+    left: 100%;
+  }
+
+  /* Cards avec bordures subtiles */
+  .card-gradient {
+    background: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--accent-foreground));
 }

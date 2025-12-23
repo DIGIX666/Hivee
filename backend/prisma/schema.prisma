@@ -1,0 +1,165 @@
+// Prisma schema for Agent Upload Service
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  walletAddress String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  borrowerAgents Agent[]
+  lenderAgents   Lender[]
+
+  @@map("users")
+}
+
+model Agent {
+  id               String   @id @default(uuid())
+  ownerId          String
+  name             String
+  description      String?
+  codeHash         String
+  escrowAddress          String?  @unique
+  originalPaymentAddress String?
+  agentIdentityId        Int?     @unique
+  status           AgentStatus @default(PENDING)
+  language         String   // "python", "javascript", "typescript"
+  originalCodePath String
+  modifiedCodePath String?
+  containerId      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  loans Loan[]
+  tasks Task[]
+  scanResults ScanResult[]
+
+  @@map("agents")
+}
+
+enum AgentStatus {
+  PENDING       // Just uploaded, awaiting processing
+  SCANNING      // Security scan in progress
+  SCAN_FAILED   // Security scan failed
+  MODIFYING     // Code modification in progress
+  DEPLOYING     // Deploying container
+  ACTIVE        // Running and operational
+  PAUSED        // Temporarily paused
+  FAILED        // Deployment failed
+}
+
+model Lender {
+  id              String   @id @default(uuid())
+  ownerId         String
+  contractAddress String   @unique
+  name            String
+  maxLoanAmount   Decimal  @db.Decimal(18, 6)
+  interestRate    Int      // basis points
+  minCreditScore  Int
+  isActive        Boolean  @default(true)
+  totalFunds      Decimal  @db.Decimal(18, 6) @default(0)
+  availableFunds  Decimal  @db.Decimal(18, 6) @default(0)
+  totalLent       Decimal  @db.Decimal(18, 6) @default(0)
+  totalRepaid     Decimal  @db.Decimal(18, 6) @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  loans Loan[]
+
+  @@map("lenders")
+}
+
+model Loan {
+  id                String   @id @default(uuid())
+  borrowerAgentId   String
+  lenderAgentId     String?  // Optional: null when awaiting a lender
+  requestId         Int?     @unique
+  principal         Decimal  @db.Decimal(18, 6)
+  interestRate      Int?     // basis points - Optional until lender is assigned
+  expectedRepayment Decimal? @db.Decimal(18, 6) // Optional until lender is assigned
+  actualRepayment   Decimal? @db.Decimal(18, 6)
+  status            LoanStatus @default(PENDING)
+  zkProofHash       String
+  expectedRevenue   Decimal  @db.Decimal(18, 6)
+  requestedAt       DateTime @default(now())
+  disbursedAt       DateTime?
+  repaidAt          DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  borrowerAgent Agent   @relation(fields: [borrowerAgentId], references: [id], onDelete: Cascade)
+  lenderAgent   Lender? @relation(fields: [lenderAgentId], references: [id], onDelete: Cascade)
+  task          Task?
+
+  @@map("loans")
+}
+
+enum LoanStatus {
+  PENDING       // Awaiting a lender to accept
+  REQUESTED     // Lender found, request sent
+  APPROVED      // Lender approved the loan
+  DISBURSED     // Funds disbursed to agent
+  REPAID        // Loan fully repaid
+  REJECTED      // Lender rejected the loan
+  DEFAULTED     // Agent defaulted on loan
+}
+
+model Task {
+  id              String   @id @default(uuid())
+  agentId         String
+  taskHash        String   @unique
+  amount          Decimal  @db.Decimal(18, 6)
+  status          TaskStatus @default(PENDING)
+  clientHash      String   // Hash of client identifier (for privacy)
+  zkProofHash     String?
+  loanId          String?  @unique              // Link to the loan if one was requested
+  requiresLoan    Boolean  @default(false)      // Indicates if loan is necessary
+  loanThreshold   Decimal  @db.Decimal(18, 6) @default(10.0)  // Threshold for loan
+  description     String?                        // Description of the task
+  zkProofData     Json?                          // Complete proof data
+  createdAt       DateTime @default(now())
+  completedAt     DateTime?
+  paidAt          DateTime?
+  fundedAt        DateTime?                      // When funds are received
+  updatedAt       DateTime @updatedAt
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  loan  Loan?  @relation(fields: [loanId], references: [id])
+
+  @@map("tasks")
+}
+
+enum TaskStatus {
+  PENDING           // Task created, awaiting ZK proof
+  AWAITING_FUNDS    // ZK proof OK, awaiting funding
+  FUNDED            // Funds received, ready to execute
+  IN_PROGRESS       // Execution in progress
+  COMPLETED         // Task completed
+  PAID              // Payment received
+  FAILED            // Failed
+  CANCELLED         // Cancelled
+}
+
+model ScanResult {
+  id         String   @id @default(uuid())
+  agentId    String
+  scanType   String   // "bandit", "eslint", "semgrep", "trivy"
+  passed     Boolean
+  findings   Json     // Array of findings
+  severity   String   // "high", "medium", "low"
+  scannedAt  DateTime @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("scan_results")
+}

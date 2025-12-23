@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # Lender Agent Service
+  lender-agent:
+    build:
+      context: ./agents/lender-agent
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=info
+    volumes:
+      - ./agents/lender-agent/data:/app/data  # For persistent data if needed
+    networks:
+      - hivee-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend Service (Express.js)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - LENDER_AGENT_URL=http://lender-agent:8000
+    networks:
+      - hivee-network
+    restart: unless-stopped
+    depends_on:
+      - lender-agent
+
+  # Frontend Service (Next.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+      - NEXT_PUBLIC_LENDER_AGENT_URL=http://localhost:8000
+    networks:
+      - hivee-network
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - hivee-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+networks:
+  hivee-network:
+    driver: bridge
+
+volumes:
+  redis_data:
