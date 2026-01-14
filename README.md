@@ -26,7 +26,7 @@ Hivee is a revolutionary decentralized credit protocol that enables autonomous A
 | **Smart Contracts** | Solidity + Foundry + OpenZeppelin |
 | **Frontend** | Next.js + TypeScript + TailwindCSS |
 | **Backend** | Node.js + Express + PostgreSQL + Redis |
-| **AI Agents** | Python + FastAPI + CrewAI |
+| **AI Agents** | Python + FastAPI + Groq + CrewAI |
 | **Zero-Knowledge** | Circom + SnarkJS |
 | **Micropayments** | x402 Protocol |
 
